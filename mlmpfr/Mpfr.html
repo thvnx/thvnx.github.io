@@ -1,0 +1,1383 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Mpfr" rel="Chapter" href="Mpfr.html"><link title="Initialization" rel="Section" href="#2_Initialization">
+<link title="Conversion" rel="Section" href="#2_Conversion">
+<link title="Basic Arithmetic" rel="Section" href="#2_BasicArithmetic">
+<link title="Comparison" rel="Section" href="#2_Comparison">
+<link title="Special" rel="Section" href="#2_Special">
+<link title="Input and Output" rel="Section" href="#2_InputandOutput">
+<link title="Integer and Remainder Related" rel="Section" href="#2_IntegerandRemainderRelated">
+<link title="Rounding Related" rel="Section" href="#2_RoundingRelated">
+<link title="Miscellaneous" rel="Section" href="#2_Miscellaneous">
+<link title="Exception Related" rel="Section" href="#2_ExceptionRelated">
+<title>Mpfr</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Mpfr.html">Mpfr</a></h1>
+
+<pre><span id="MODULEMpfr"><span class="keyword">module</span> Mpfr</span>: <code class="code">sig</code> <a href="Mpfr.html">..</a> <code class="code">end</code></pre><div class="info module top">
+<div class="info-desc">
+<p>OCaml bindings for MPFR.</p>
+
+<p>A <code class="code">mpfr_float</code> is an immutable data structure that contains a <em>mpfr_t</em> number, as well as an optional ternary value, as provided by
+(and described in) the <a href="http://www.mpfr.org">MPFR library</a>.</p>
+
+<p>A few distinctions are made from the original C library:</p>
+
+<ul>
+<li>the <em>mpfr_</em> prefix is ommited for all functions;</li>
+<li><em>mpfr_init*</em> and <em>mpfr_set*</em> functions are not provided in order to
+implement these bindings with respect to the functional paradigm
+(i.e. immutability). Consequently, <em>mpfr_clear*</em> functions are not
+provided too, and so, the garbage collector is in charge of memory
+management;</li>
+<li>functions managing the following types are not
+supported: <em>unsigned long int</em>, <em>uintmax_t</em>, <em>intmax_t</em>, <em>float</em>, <em>long double</em>, <em>_Decimal64</em>, <em>mpz_t</em>, <em>mpq_t</em>, and <em>mpf_t</em>. Except for <em>mpfr_sqrt_ui</em> and <em>mpfr_fac_ui</em> which are
+partially supported on the range of the positive values of an OCaml
+signed integer. In fact, only the OCaml native types (<code class="code">int</code>, <code class="code">float</code>,
+and <code class="code">string</code>) are supported, assuming that a <code class="code">float</code> is a
+double-precision floating-point number and an <code class="code">int</code> is a 64-bits
+signed integer. Thus, all functions named with <em>*_ui*</em> or <em>*_d*</em>
+are renamed here with <em>*_int*</em> or <em>*_float*</em>, respectively;</li>
+<li>bindings to functions <em>mpfr_*printf</em>, <em>mpfr_*random*</em>, <em>mpfr_get_patches</em>, <em>mpfr_buildopt_*</em>, and macros <em>MPFR_VERSION*</em>
+are not implemented.</li>
+</ul>
+
+<p>In the sequel, if not provided, optional parameters <code class="code">prec</code> and <code class="code">rnd</code>
+are set to MPFR's defaults precision and rounding mode. Functions
+which take a precision, or a base as a parameter raise exceptions. See
+<code class="code">Precision_range</code> and <code class="code">Base_range</code>.</p>
+
+<p>Some of the comments below are derived from the
+<a href="http://www.mpfr.org/mpfr-current/mpfr.html">MPFR documentation</a>
+itself. Nevertheless, please refer to the original documentation for
+further explanations.</p>
+</div>
+</div>
+<hr width="100%">
+
+<pre><span id="EXCEPTIONPrecision_range"><span class="keyword">exception</span> Precision_range</span> <span class="keyword">of</span> <code class="type">int</code></pre>
+<div class="info ">
+<div class="info-desc">
+<p>Raised if precision is not included in [<code class="code">Mpfr.mpfr_prec_min</code>;
+<code class="code">Mpfr.mpfr_prec_max</code>].</p>
+</div>
+</div>
+
+<pre><span id="EXCEPTIONBase_range"><span class="keyword">exception</span> Base_range</span> <span class="keyword">of</span> <code class="type">int</code></pre>
+<div class="info ">
+<div class="info-desc">
+<p>Raised if base is not included in [<code class="code">2</code>;<code class="code">64</code>], or <code class="code">0</code> (automatic
+base detection).</p>
+</div>
+</div>
+
+<pre><code><span id="TYPEsign"><span class="keyword">type</span> <code class="type"></code>sign</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsign.Positive"><span class="constructor">Positive</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsign.Negative"><span class="constructor">Negative</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPEmpfr_t"><span class="keyword">type</span> <code class="type"></code>mpfr_t</span> </pre>
+<div class="info ">
+<div class="info-desc">
+<p>Binding to C MPFR <em><a href="http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">mpfr_t</a></em>
+type.</p>
+</div>
+</div>
+
+
+<pre><code><span id="TYPEternary"><span class="keyword">type</span> <code class="type"></code>ternary</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTternary.Correct_Rounding"><span class="constructor">Correct_Rounding</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTternary.Greater"><span class="constructor">Greater</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTternary.Lower"><span class="constructor">Lower</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+<div class="info-desc">
+<p>Associated to an <code class="code">mpfr_t</code> value, a
+<a href="http://www.mpfr.org/mpfr-current/mpfr.html#Rounding-Modes"><code class="code">ternary</code></a>
+value indicates if it was correctly rounded.</p>
+</div>
+</div>
+
+
+<pre><span id="TYPEmpfr_float"><span class="keyword">type</span> <code class="type"></code>mpfr_float</span> = <code class="type"><a href="Mpfr.html#TYPEmpfr_t">mpfr_t</a> * <a href="Mpfr.html#TYPEternary">ternary</a> option</code> </pre>
+
+
+<pre><code><span id="TYPEmpfr_rnd_t"><span class="keyword">type</span> <code class="type"></code>mpfr_rnd_t</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.To_Nearest"><span class="constructor">To_Nearest</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.Toward_Zero"><span class="constructor">Toward_Zero</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.Toward_Plus_Infinity"><span class="constructor">Toward_Plus_Infinity</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.Toward_Minus_Infinity"><span class="constructor">Toward_Minus_Infinity</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.Away_From_Zero"><span class="constructor">Away_From_Zero</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+<div class="info-desc">
+<p>Rounding
+<a href="http://www.mpfr.org/mpfr-current/mpfr.html#Rounding-Modes">modes</a>.</p>
+</div>
+</div>
+
+
+<pre><span id="VALmpfr_prec_min"><span class="keyword">val</span> mpfr_prec_min</span> : <code class="type">int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Minimum allowed precision.</p>
+</div>
+</div>
+
+<pre><span id="VALmpfr_prec_max"><span class="keyword">val</span> mpfr_prec_max</span> : <code class="type">int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Maximum allowed precision.</p>
+</div>
+</div>
+<h3 id="2_Initialization">Initialization</h3>
+<pre><span id="VALset_default_prec"><span class="keyword">val</span> set_default_prec</span> : <code class="type">int -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.set_default_prec p</code> modifies the default precision to be
+exactly <code class="code">p</code> bits. The precision of a variable means the number of bits
+used to store its significand. All subsequent calls to any functions
+will use this precision by default, but previously initialized
+variables are unaffected. The default precision is set to 53 bits
+initially.</p>
+</div>
+</div>
+
+<pre><span id="VALget_default_prec"><span class="keyword">val</span> get_default_prec</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the current default MPFR precision in bits.</p>
+</div>
+</div>
+
+<pre><span id="VALget_prec"><span class="keyword">val</span> get_prec</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.get_prec x</code> returns the precision of <code class="code">x</code>. The corresponding
+<code class="code">Mpfr.set_prec x prec</code> function is not allowed, use
+<code class="code">Mpfr.make_from_mpfr ~prec:prec x</code> instead.</p>
+</div>
+</div>
+
+<pre><span id="VALmake_from_mpfr"><span class="keyword">val</span> make_from_mpfr</span> : <code class="type">?prec:int -> ?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a fresh <code class="code">mpfr_float</code> number of precision <code class="code">~prec</code>
+(optional), made from another <code class="code">mpfr_float</code> number, in direction <code class="code">~rnd</code>
+(optional).</p>
+</div>
+</div>
+
+<pre><span id="VALmake_from_int"><span class="keyword">val</span> make_from_int</span> : <code class="type">?prec:int -> ?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a fresh <code class="code">mpfr_float</code> number of precision <code class="code">~prec</code>
+(optional), made from an <code class="code">int</code>, in direction <code class="code">~rnd</code> (optional).</p>
+</div>
+</div>
+
+<pre><span id="VALmake_from_float"><span class="keyword">val</span> make_from_float</span> : <code class="type">?prec:int -> ?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a fresh <code class="code">mpfr_float</code> number of precision <code class="code">~prec</code>
+(optional), made from a <code class="code">float</code>, in direction <code class="code">~rnd</code> (optional).</p>
+</div>
+</div>
+
+<pre><span id="VALmake_from_str"><span class="keyword">val</span> make_from_str</span> : <code class="type">?prec:int -> ?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?base:int -> string -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.make_from_str s ~base:b ~prec:p ~rnd:r</code> returns a fresh
+<code class="code">mpfr_float</code> of precision <code class="code">p</code> from the string value <code class="code">s</code> in base <code class="code">b</code>,
+rounded in direction <code class="code">r</code> (<code class="code">p</code>, <code class="code">b</code>, and <code class="code">r</code> are optional).</p>
+</div>
+</div>
+
+<pre><span id="VALmake_nan"><span class="keyword">val</span> make_nan</span> : <code class="type">?prec:int -> unit -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a NaN with precision <code class="code">~prec</code> if provided, otherwise default
+precision is used.</p>
+</div>
+</div>
+
+<pre><span id="VALmake_inf"><span class="keyword">val</span> make_inf</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEsign">sign</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a infinity with precision <code class="code">~prec</code> if provided, otherwise
+default precision is used.</p>
+</div>
+</div>
+
+<pre><span id="VALmake_zero"><span class="keyword">val</span> make_zero</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEsign">sign</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a zero with precision <code class="code">~prec</code> if provided, otherwise
+default precision is used.</p>
+</div>
+</div>
+<h3 id="2_Conversion">Conversion</h3><p>If not provided, default values for <code class="code">rnd</code> and <code class="code">prec</code> are the
+defaults MPFR precision and rounding mode internal settings (use
+<code class="code">Mpfr.set_default_rounding_mode</code> or <code class="code">Mpfr.set_default_prec</code> to modify
+them).</p>
+
+<pre><span id="VALget_float"><span class="keyword">val</span> get_float</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float</code></pre><div class="info ">
+<div class="info-desc">
+<p>Conversion to a <code class="code">float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_int"><span class="keyword">val</span> get_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Conversion to an <code class="code">int</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_float_2exp"><span class="keyword">val</span> get_float_2exp</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float * int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.get_float_2exp x</code> returns <code class="code">(n, exp)</code> such that <code class="code">0.5 &lt;= |n| &lt;
+1</code> and <code class="code">n</code> times 2 raised to <code class="code">exp</code> equals <code class="code">x</code> rounded to float
+precision.</p>
+</div>
+</div>
+
+<pre><span id="VALget_mpfr_2exp"><span class="keyword">val</span> get_mpfr_2exp</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.get_mpfr_2exp x</code> returns <code class="code">(n, exp)</code> such that <code class="code">0.5 &lt;= |n| &lt;
+1</code> and <code class="code">n</code> times 2 raised to <code class="code">exp</code> equals <code class="code">x</code> rounded to <code class="code">~prec</code>
+precision.</p>
+</div>
+</div>
+
+<pre><span id="VALget_str"><span class="keyword">val</span> get_str</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?base:int -> ?size:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> string * string</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.get_str ~rnd:r ~base:b ~size:s x</code> converts <code class="code">x</code> to a tuple
+<code class="code">(frac, exp)</code>, where <code class="code">frac</code> is a fraction (a string of digits in base
+<code class="code">b</code>) with rounding to direction <code class="code">r</code>, and <code class="code">exp</code> is an exponent. <code class="code">s</code> is
+the number of significand digits output in <code class="code">frac</code>. If <code class="code">s</code> is zero, the
+number of digits of the significand is chosen large enough so that
+re-reading the printed value with the same precision, assuming both
+output and input use rounding to nearest, will recover the original
+value of <code class="code">x</code>. Decimal is the default base and default size is zero.</p>
+</div>
+</div>
+
+<pre><span id="VALget_formatted_str"><span class="keyword">val</span> get_formatted_str</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?base:int -> ?size:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> string</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.get_formatted_str</code> is identical to <code class="code">Mpfr.get_str</code> except
+that it returns a full-formatted string (equivalent to <em>mpfr_printf("%.Re", x)</em>).</p>
+</div>
+</div>
+
+<pre><span id="VALfits_int_p"><span class="keyword">val</span> fits_int_p</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return true if the <code class="code">mpfr_float</code> would fit in a <code class="code">int</code>, when rounded to
+an integer in the direction <code class="code">~rnd</code>.</p>
+</div>
+</div>
+<h3 id="2_BasicArithmetic">Basic Arithmetic</h3><p>If not provided, default values for <code class="code">rnd</code> and <code class="code">prec</code> are the
+defaults MPFR precision and rounding mode internal settings (use
+<code class="code">Mpfr.set_default_rounding_mode</code> or <code class="code">Mpfr.set_default_prec</code> to modify
+them).</p>
+
+<pre><span id="VALadd"><span class="keyword">val</span> add</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Addition of two <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALadd_int"><span class="keyword">val</span> add_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Addition of a <code class="code">mpfr_float</code> and an <code class="code">int</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALadd_float"><span class="keyword">val</span> add_float</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Addition of a <code class="code">mpfr_float</code> and a <code class="code">float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsub"><span class="keyword">val</span> sub</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Subtraction of two <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsub_int"><span class="keyword">val</span> sub_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Subtraction of a <code class="code">mpfr_float</code> and an <code class="code">int</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALint_sub"><span class="keyword">val</span> int_sub</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Subtraction of an <code class="code">int</code> and a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsub_float"><span class="keyword">val</span> sub_float</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Addition of a <code class="code">mpfr_float</code> and a <code class="code">float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfloat_sub"><span class="keyword">val</span> float_sub</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Subtraction of a <code class="code">float</code> and an <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALmul"><span class="keyword">val</span> mul</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Multiplication of two <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALmul_int"><span class="keyword">val</span> mul_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Multiplication of a <code class="code">mpfr_float</code> and an <code class="code">int</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALmul_float"><span class="keyword">val</span> mul_float</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Multiplication of an <code class="code">int</code> and a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALdiv"><span class="keyword">val</span> div</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Division of two <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALdiv_int"><span class="keyword">val</span> div_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Division of a <code class="code">mpfr_float</code> by an <code class="code">int</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALint_div"><span class="keyword">val</span> int_div</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Division of an <code class="code">int</code> by a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALdiv_float"><span class="keyword">val</span> div_float</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Division of an <code class="code">int</code> by a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfloat_div"><span class="keyword">val</span> float_div</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> float -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Division of a <code class="code">float</code> by a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsqrt"><span class="keyword">val</span> sqrt</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the square root of a <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALsqrt_int"><span class="keyword">val</span> sqrt_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the square root of an <code class="code">int</code>. Return <code class="code">nan</code> if negative.</p>
+</div>
+</div>
+
+<pre><span id="VALrec_sqrt"><span class="keyword">val</span> rec_sqrt</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the reciprocal square root of an <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALcbrt"><span class="keyword">val</span> cbrt</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Returns the cubic root of an <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALroot"><span class="keyword">val</span> root</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.root x k</code> returns the <code class="code">k</code>-th root of <code class="code">x</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALpow"><span class="keyword">val</span> pow</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.pow x y</code> returns <code class="code">x</code> raised to <code class="code">y</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALpow_int"><span class="keyword">val</span> pow_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.pow_int x y</code> returns <code class="code">x</code> raised to <code class="code">y</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALneg"><span class="keyword">val</span> neg</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Compute the negation of an <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALabs"><span class="keyword">val</span> abs</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Compute the absolute value of an <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALdim"><span class="keyword">val</span> dim</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.dim x y</code> returs the positive difference of <code class="code">x</code> and <code class="code">y</code>, i.e.,
+ <code class="code">x - y</code> if <code class="code">x &gt; y</code>, <code class="code">+0</code> if <code class="code">x &lt;= y</code>, and NaN if <code class="code">x</code> or <code class="code">y</code> is NaN.</p>
+</div>
+</div>
+
+<pre><span id="VALmul_2int"><span class="keyword">val</span> mul_2int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.mul_2int x y</code> returns <code class="code">x</code> times 2 raised to <code class="code">y</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALdiv_2int"><span class="keyword">val</span> div_2int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.div_2int x y</code> returns <code class="code">x</code> divided by 2 raised to <code class="code">y</code>.</p>
+</div>
+</div>
+<h3 id="2_Comparison">Comparison</h3><p>Operators <code class="code">=</code>, <code class="code">&lt;&gt;</code>, <code class="code">&gt;</code>, <code class="code">&lt;</code>, <code class="code">&gt;=</code>, and <code class="code">&lt;=</code> are supported. They
+are based on <em>mpfr_cmp</em>.</p>
+
+<pre><span id="VALcmp"><span class="keyword">val</span> cmp</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.cmp a b</code> returns a positive value if <code class="code">a</code> &gt; <code class="code">b</code>, zero if <code class="code">a</code>
+= <code class="code">b</code>, and a negative value if <code class="code">a</code> &lt; <code class="code">b</code>. If one of the operands is
+NaN, set the <code class="code">Erange</code> flag and return zero.</p>
+</div>
+</div>
+
+<pre><span id="VALcmp_int"><span class="keyword">val</span> cmp_int</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.cmp_int a b</code> compares <code class="code">a</code> and <code class="code">b</code>. Similar as above.</p>
+</div>
+</div>
+
+<pre><span id="VALcmp_float"><span class="keyword">val</span> cmp_float</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> float -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.cmp_float a b</code> compares <code class="code">a</code> and <code class="code">b</code>. Similar as above.</p>
+</div>
+</div>
+
+<pre><span id="VALcmp_int_2exp"><span class="keyword">val</span> cmp_int_2exp</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> int -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.cmp_int_2exp a b e</code> compares <code class="code">a</code> and <code class="code">b</code> multiplied by two
+to the power <code class="code">e</code>. Similar as above.</p>
+</div>
+</div>
+
+<pre><span id="VALcmpabs"><span class="keyword">val</span> cmpabs</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.cmpabs a b</code> returns a positive value if <code class="code">|a|</code> &gt; <code class="code">|b|</code>, zero
+if <code class="code">|a|</code> = <code class="code">|b|</code>, and a negative value if <code class="code">|a|</code> &lt; <code class="code">|b|</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALnan_p"><span class="keyword">val</span> nan_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Its a NaN.</p>
+</div>
+</div>
+
+<pre><span id="VALinf_p"><span class="keyword">val</span> inf_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Its an infinity.</p>
+</div>
+</div>
+
+<pre><span id="VALnumber_p"><span class="keyword">val</span> number_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Its a ordinary number (i.e., neither NaN nor an infinity).</p>
+</div>
+</div>
+
+<pre><span id="VALzero_p"><span class="keyword">val</span> zero_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Its a zero.</p>
+</div>
+</div>
+
+<pre><span id="VALregular_p"><span class="keyword">val</span> regular_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Its a regular number (i.e., neither NaN, nor an infinity nor zero).</p>
+</div>
+</div>
+
+<pre><span id="VALsgn"><span class="keyword">val</span> sgn</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEsign">sign</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the sign of a <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALgreater_p"><span class="keyword">val</span> greater_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">&gt;</code> in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALgreaterequal_p"><span class="keyword">val</span> greaterequal_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">&gt;=</code>in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALless_p"><span class="keyword">val</span> less_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">&lt;</code> in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALlessequal_p"><span class="keyword">val</span> lessequal_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">&lt;=</code> in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALequal_p"><span class="keyword">val</span> equal_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">=</code> in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALlessgreater_p"><span class="keyword">val</span> lessgreater_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Operator <code class="code">&lt;&gt;</code> in MPFR syntax style.</p>
+</div>
+</div>
+
+<pre><span id="VALunordered_p"><span class="keyword">val</span> unordered_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return true if the operands are comparable (i.e. one of them is a
+NaN), false otherwise.</p>
+</div>
+</div>
+<h3 id="2_Special">Special</h3><p>If not provided, default values for <code class="code">rnd</code> and <code class="code">prec</code> are the
+defaults MPFR precision and rounding mode internal settings (use
+<code class="code">Mpfr.set_default_rounding_mode</code> or <code class="code">Mpfr.set_default_prec</code> to modify
+them).</p>
+
+<pre><span id="VALlog"><span class="keyword">val</span> log</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the natural logarithm of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALlog2"><span class="keyword">val</span> log2</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the log2 of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALlog10"><span class="keyword">val</span> log10</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the log10 of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALexp"><span class="keyword">val</span> exp</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the exponential of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALexp2"><span class="keyword">val</span> exp2</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the 2 power of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALexp10"><span class="keyword">val</span> exp10</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the 10 power of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcos"><span class="keyword">val</span> cos</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the cosine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsin"><span class="keyword">val</span> sin</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the sine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALtan"><span class="keyword">val</span> tan</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the tangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsin_cos"><span class="keyword">val</span> sin_cos</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?sprec:int -><br>       ?cprec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return simultaneously the sine and cosine of an <code class="code">mpfr_float</code>
+number.</p>
+</div>
+</div>
+
+<pre><span id="VALsec"><span class="keyword">val</span> sec</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the secant of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcsc"><span class="keyword">val</span> csc</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the cosecant of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcot"><span class="keyword">val</span> cot</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the cotangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALacos"><span class="keyword">val</span> acos</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the arc-cosine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALasin"><span class="keyword">val</span> asin</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the arc-sine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALatan"><span class="keyword">val</span> atan</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the arc-tangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALatan2"><span class="keyword">val</span> atan2</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.atan2 x y</code> returns the arc-tangent2 of a <code class="code">x</code> and <code class="code">y</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcosh"><span class="keyword">val</span> cosh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperbolic cosine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsinh"><span class="keyword">val</span> sinh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperbolic sine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALtanh"><span class="keyword">val</span> tanh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperbolic tangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsinh_cosh"><span class="keyword">val</span> sinh_cosh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?sprec:int -><br>       ?cprec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return simultaneously the sine and cosine of an <code class="code">mpfr_float</code>
+number.</p>
+</div>
+</div>
+
+<pre><span id="VALsech"><span class="keyword">val</span> sech</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperbolic secant of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcsch"><span class="keyword">val</span> csch</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperboloc cosecant of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcoth"><span class="keyword">val</span> coth</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the hyperbolic cotangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALacosh"><span class="keyword">val</span> acosh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the inverse hyperbolic cosine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALasinh"><span class="keyword">val</span> asinh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the inverse hyperbolic sine of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALatanh"><span class="keyword">val</span> atanh</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the inverse hyperbolic tangent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfac_int"><span class="keyword">val</span> fac_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the factorial of an <code class="code">int</code>. Return NaN if input is negative.</p>
+</div>
+</div>
+
+<pre><span id="VALlog1p"><span class="keyword">val</span> log1p</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the logarithm of one plus a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALexpm1"><span class="keyword">val</span> expm1</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the exponential of a <code class="code">mpfr_float</code> followed by a subtraction by one.</p>
+</div>
+</div>
+
+<pre><span id="VALeint"><span class="keyword">val</span> eint</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the exponential integral of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALli2"><span class="keyword">val</span> li2</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the real part of the dilogarithm of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALgamma"><span class="keyword">val</span> gamma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the Gamma function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALlngamma"><span class="keyword">val</span> lngamma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the logarithm of the Gamma function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALlgamma"><span class="keyword">val</span> lgamma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * <a href="Mpfr.html#TYPEsign">sign</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the logarithm of the absolute value of the Gamma function
+and the sign of the Gamma function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALdigamma"><span class="keyword">val</span> digamma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the Digamma (sometimes also called Psi) function on a
+<code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALzeta"><span class="keyword">val</span> zeta</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the Riemann Zeta function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALerf"><span class="keyword">val</span> erf</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the error function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALerfc"><span class="keyword">val</span> erfc</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the complementary error function on a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALj0"><span class="keyword">val</span> j0</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of the first kind Bessel function of order 0 on a
+<code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALj1"><span class="keyword">val</span> j1</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of the first kind Bessel function of order 1 on a
+<code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALjn"><span class="keyword">val</span> jn</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.jn n x</code> returns the value of the first kind Bessel function
+of order <code class="code">n</code> on <code class="code">x</code>. Return NaN if <code class="code">n</code> is negative.</p>
+</div>
+</div>
+
+<pre><span id="VALy0"><span class="keyword">val</span> y0</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of the second kind Bessel function of order 0 on
+a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALy1"><span class="keyword">val</span> y1</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of the second kind Bessel function of order 1 on
+a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALyn"><span class="keyword">val</span> yn</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.jn n x</code> returns the value of the second kind Bessel function
+of order <code class="code">n</code> on <code class="code">x</code>. Return NaN if <code class="code">n</code> is negative.</p>
+</div>
+</div>
+
+<pre><span id="VALfma"><span class="keyword">val</span> fma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the fused multiply and add of <code class="code">mpfr_float</code>
+numbers. <code class="code">Mpfr.fma x y z</code> retuns <code class="code">xy+z</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfms"><span class="keyword">val</span> fms</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the fused multiply and sub of <code class="code">mpfr_float</code>
+numbers. <code class="code">Mpfr.fma x y z</code> retuns <code class="code">xy-z</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALagm"><span class="keyword">val</span> agm</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the arithmetic-geometric mean of a <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALhypot"><span class="keyword">val</span> hypot</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the Euclidean norm of a <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALai"><span class="keyword">val</span> ai</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of the Airy function Ai on a <code class="code">mpfr_float</code> number.</p>
+</div>
+</div>
+
+<pre><span id="VALconst_log2"><span class="keyword">val</span> const_log2</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the logarithm of 2.</p>
+</div>
+</div>
+
+<pre><span id="VALconst_pi"><span class="keyword">val</span> const_pi</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of <em>Pi</em>.</p>
+</div>
+</div>
+
+<pre><span id="VALconst_euler"><span class="keyword">val</span> const_euler</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of Euler's constant 0.577...</p>
+</div>
+</div>
+
+<pre><span id="VALconst_catalan"><span class="keyword">val</span> const_catalan</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the value of Catalan's constant 0.915...</p>
+</div>
+</div>
+
+<pre><span id="VALsum"><span class="keyword">val</span> sum</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> list -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the sum of all the elements of the list.</p>
+</div>
+</div>
+<h3 id="2_InputandOutput">Input and Output</h3><p>The two following functions are <b>deprecated</b>. Use
+<code class="code">Mpfr.get_formatted_str</code> and <code class="code">Mpfr.make_from_str</code>.</p>
+
+<pre><span id="VALout_str"><span class="keyword">val</span> out_str</span> : <code class="type">Pervasives.out_channel -><br>       int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.out_str stdout b s x Mpfr.To_Nearest</code> outputs <code class="code">x</code>, in base
+<code class="code">b</code>, to <code class="code">stdout</code>, in the direction <code class="code">Mpfr.To_Nearest</code>. The size of the
+printed output is <code class="code">s</code> digits long. It uses <code class="code">Printf.fprintf</code> and
+<code class="code">Mpfr.get_formatted_string</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALinp_str"><span class="keyword">val</span> inp_str</span> : <code class="type">Pervasives.in_channel -> int -> int -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.inp_str stdin b p Mpfr.To_Nearest</code> returns a <code class="code">mpfr_float</code>
+number of precision <code class="code">p</code> from a string in base <code class="code">b</code> read on <code class="code">stdin</code>. It
+uses <code class="code">Pervasives.input_line</code> and <code class="code">Mpfr.make_from_str</code>.</p>
+</div>
+</div>
+<h3 id="2_IntegerandRemainderRelated">Integer and Remainder Related</h3><p>If not provided, default values for <code class="code">rnd</code> and <code class="code">prec</code> are the defaults MPFR precision and rounding mode
+internal settings (use <code class="code">Mpfr.set_default_rounding_mode</code> or <code class="code">Mpfr.set_default_prec</code> to modify them).</p>
+
+<pre><span id="VALrint"><span class="keyword">val</span> rint</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest representable integer in the direction <code class="code">~rnd</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALceil"><span class="keyword">val</span> ceil</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the next higher or equal representable integer.</p>
+</div>
+</div>
+
+<pre><span id="VALfloor"><span class="keyword">val</span> floor</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the next lower or equal representable integer.</p>
+</div>
+</div>
+
+<pre><span id="VALround"><span class="keyword">val</span> round</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest representable integer (rounding halfway cases
+away from zero as in the roundTiesToAway mode of IEEE 754-2008).</p>
+</div>
+</div>
+
+<pre><span id="VALtrunc"><span class="keyword">val</span> trunc</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest representable integer toward zero.</p>
+</div>
+</div>
+
+<pre><span id="VALrint_ceil"><span class="keyword">val</span> rint_ceil</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the next higher or equal representable integer.
+If the result is not representable, it is rounded in the direction <code class="code">~rnd</code></p>
+</div>
+</div>
+
+<pre><span id="VALrint_floor"><span class="keyword">val</span> rint_floor</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the next lower or equal representable integer.
+If the result is not representable, it is rounded in the direction <code class="code">~rnd</code></p>
+</div>
+</div>
+
+<pre><span id="VALrint_round"><span class="keyword">val</span> rint_round</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest representable integer (rounding halfway
+cases away from zero). If the result is not representable, it is rounded in the direction <code class="code">~rnd</code></p>
+</div>
+</div>
+
+<pre><span id="VALrint_trunc"><span class="keyword">val</span> rint_trunc</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the next integer toward zero.
+If the result is not representable, it is rounded in the direction <code class="code">~rnd</code></p>
+</div>
+</div>
+
+<pre><span id="VALfrac"><span class="keyword">val</span> frac</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the fractional part of an <code class="code">mpfr_float</code> (with the same sign).</p>
+</div>
+</div>
+
+<pre><span id="VALmodf"><span class="keyword">val</span> modf</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?iprec:int -><br>       ?fprec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return simultaneously the integral part and the fractional part of an <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfmod"><span class="keyword">val</span> fmod</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fmod x y</code> returns the value <code class="code">x - ny</code>, where <code class="code">n</code> is the integer quotient of <code class="code">x / y</code>
+(rounded toward zero).</p>
+</div>
+</div>
+
+<pre><span id="VALremainder"><span class="keyword">val</span> remainder</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.remainder x y</code> returns the value <code class="code">x - ny</code>, where <code class="code">n</code> is the integer quotient of <code class="code">x / y</code>
+(rounded to the nearest integer, ties rounded to even).</p>
+</div>
+</div>
+
+<pre><span id="VALremquo"><span class="keyword">val</span> remquo</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.remquo x y</code> returns the tuple (<code class="code">x - ny</code>, <code class="code">q</code>), where <code class="code">n</code> is the integer quotient of <code class="code">x / y</code> (rounded to
+the nearest integer, ties rounded to even), and <code class="code">q</code> are the low significant bits from the quotient <code class="code">n</code> with the
+sign of <code class="code">x</code> divided by <code class="code">y</code> (except if those low bits are all zero, in which case zero is returned).</p>
+</div>
+</div>
+
+<pre><span id="VALinteger_p"><span class="keyword">val</span> integer_p</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return true iff the input <code class="code">mpfr_float</code> is an integer.</p>
+</div>
+</div>
+<h3 id="2_RoundingRelated">Rounding Related</h3>
+<pre><span id="VALset_default_rounding_mode"><span class="keyword">val</span> set_default_rounding_mode</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the default rounding mode. The default rounding mode is to nearest initially.</p>
+</div>
+</div>
+
+<pre><span id="VALget_default_rounding_mode"><span class="keyword">val</span> get_default_rounding_mode</span> : <code class="type">unit -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Get the default rounding mode.</p>
+</div>
+</div>
+
+<pre><span id="VALprec_round"><span class="keyword">val</span> prec_round</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.prec_round ~rnd:r x p</code> rounds <code class="code">x</code> according to <code class="code">r</code> with precision <code class="code">p</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcan_round"><span class="keyword">val</span> can_round</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> int -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Assuming <code class="code">b</code> is an approximation of an unknown <code class="code">mpfr_number</code> <code class="code">x</code> in the direction <code class="code">r1</code> with
+error at most two to the power <em>E(<code class="code">b</code>)-<code class="code">err</code></em> where <em>E(<code class="code">b</code>)</em> is the exponent of <code class="code">b</code>, return
+<code class="code">true</code> if <code class="code">Mpfr.can_round x err r1 r2 p</code> is able to round correctly <code class="code">x</code> to precision <code class="code">p</code> with the
+direction <code class="code">r2</code>, and <code class="code">false</code> otherwise (including for NaN and Inf).</p>
+</div>
+</div>
+
+<pre><span id="VALmin_prec"><span class="keyword">val</span> min_prec</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the minimal number of bits required to store the significand of an <code class="code">mpfr_float</code>,
+and 0 for special values, including 0.</p>
+</div>
+</div>
+
+<pre><span id="VALprint_rnd_mode"><span class="keyword">val</span> print_rnd_mode</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> string</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a MPFR-like string ("MPFR_RNDD", "MPFR_RNDU", "MPFR_RNDN", "MPFR_RNDZ", "MPFR_RNDA") corresponding
+to the (<code class="code">Toward_Minus_Infinity</code>, <code class="code">Toward_Plus_Infinity</code>, <code class="code">To_Nearest</code>, <code class="code">Toward_Zero</code>, <code class="code">Away_From_Zero</code>) rounding modes.</p>
+</div>
+</div>
+<h3 id="2_Miscellaneous">Miscellaneous</h3>
+<pre><span id="VALnexttoward"><span class="keyword">val</span> nexttoward</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.nexttoward x y</code> returns NaN if <code class="code">x</code> or <code class="code">y</code> is NaN, returns a copy of <code class="code">x</code> if <code class="code">x</code> and <code class="code">y</code> are equal. Otherwise,
+if <code class="code">x</code> is different from <code class="code">y</code>, return the next floating-point number of <code class="code">x</code> (with the precision of <code class="code">x</code> and the current
+exponent range) in the direction of <code class="code">y</code> (the infinite values are seen as the smallest and largest floating-point
+numbers). If the result is zero, it keeps the sign of <code class="code">x</code>. No underflow or overflow is generated.</p>
+</div>
+</div>
+
+<pre><span id="VALnextabove"><span class="keyword">val</span> nextabove</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Equivalent to <code class="code">Mpfr.nexttoward</code> where <code class="code">y</code> is plus infinity.</p>
+</div>
+</div>
+
+<pre><span id="VALnextbelow"><span class="keyword">val</span> nextbelow</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Equivalent to <code class="code">Mpfr.nexttoward</code> where <code class="code">y</code> is minus infinity.</p>
+</div>
+</div>
+
+<pre><span id="VALmin"><span class="keyword">val</span> min</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the minimum of two <code class="code">mpfr_float</code>. If operands are both NaN, then return NaN. If one operand is NaN, then
+return the other value. If operands are zeros of different signs, then return -0.</p>
+</div>
+</div>
+
+<pre><span id="VALmax"><span class="keyword">val</span> max</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the maximum of two <code class="code">mpfr_float</code>. If operands are both NaN, then return NaN. If one operand is NaN, then
+return the other value. If operands are zeros of different signs, then return +0.</p>
+</div>
+</div>
+
+<pre><span id="VALget_exp"><span class="keyword">val</span> get_exp</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the exponent of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALset_exp"><span class="keyword">val</span> set_exp</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return a fresh <code class="code">mpfr_float</code> from input with new precision.</p>
+</div>
+</div>
+
+<pre><span id="VALsignbit"><span class="keyword">val</span> signbit</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEsign">sign</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the sign of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALsetsign"><span class="keyword">val</span> setsign</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEsign">sign</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.setsign x s ~rnd:r</code> returns a fresh copy of <code class="code">x</code> with the sign <code class="code">s</code>, with precision <code class="code">p</code> in direction <code class="code">r</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcopysign"><span class="keyword">val</span> copysign</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.copysign x y ~rnd:r</code> returns a fresh copy of <code class="code">x</code> with the sign of <code class="code">y</code>, with precision <code class="code">p</code> in direction <code class="code">r</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_version"><span class="keyword">val</span> get_version</span> : <code class="type">unit -> string</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the MPFR version.</p>
+</div>
+</div>
+<h3 id="2_ExceptionRelated">Exception Related</h3>
+<pre><span id="VALget_emin"><span class="keyword">val</span> get_emin</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the (current) smallest exponent allowed for a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_emax"><span class="keyword">val</span> get_emax</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the (current) largest exponent allowed for a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALset_emin"><span class="keyword">val</span> set_emin</span> : <code class="type">int -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the smallest exponent allowed for a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALset_emax"><span class="keyword">val</span> set_emax</span> : <code class="type">int -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the largest exponent allowed for a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_emin_min"><span class="keyword">val</span> get_emin_min</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the minimum of the exponents allowed for <code class="code">Mpfr.set_emin</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_emin_max"><span class="keyword">val</span> get_emin_max</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the maximum of the exponents allowed for <code class="code">Mpfr.set_emin</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_emax_min"><span class="keyword">val</span> get_emax_min</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the minimum of the exponents allowed for <code class="code">Mpfr.set_emax</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALget_emax_max"><span class="keyword">val</span> get_emax_max</span> : <code class="type">unit -> int</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the maximum of the exponents allowed for <code class="code">Mpfr.set_emax</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALcheck_range"><span class="keyword">val</span> check_range</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.check_range ~rnd:r x</code> assumes that <code class="code">x</code> is the correctly-rounded value of some real value
+<code class="code">y</code> in the direction <code class="code">r</code> and some extended exponent range.</p>
+</div>
+</div>
+
+<pre><span id="VALsubnormalize"><span class="keyword">val</span> subnormalize</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.subnormalize ~rnd:r x</code> rounds <code class="code">x</code> emulating subnormal number arithmetic: if <code class="code">x</code> is outside
+the subnormal exponent range, it just return a copy of <code class="code">x</code>; otherwise, it returns a roudning of <code class="code">x</code>
+to precision <em>EXP(<code class="code">x</code>)-emin+1</em> according to rounding mode <code class="code">r</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_underflow"><span class="keyword">val</span> clear_underflow</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the underflow flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_overflow"><span class="keyword">val</span> clear_overflow</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the overflow flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_divby0"><span class="keyword">val</span> clear_divby0</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the divide-by-zero flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_nanflag"><span class="keyword">val</span> clear_nanflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the invalid flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_inexflag"><span class="keyword">val</span> clear_inexflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the inexact flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_erangeflag"><span class="keyword">val</span> clear_erangeflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear the <em>erange</em> flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_underflow"><span class="keyword">val</span> set_underflow</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the underflow flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_overflow"><span class="keyword">val</span> set_overflow</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the overflow flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_divby0"><span class="keyword">val</span> set_divby0</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the divide-by-zero flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_nanflag"><span class="keyword">val</span> set_nanflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the invalid flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_inexflag"><span class="keyword">val</span> set_inexflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the inexact flag.</p>
+</div>
+</div>
+
+<pre><span id="VALset_erangeflag"><span class="keyword">val</span> set_erangeflag</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Set the <em>erange</em> flag.</p>
+</div>
+</div>
+
+<pre><span id="VALclear_flags"><span class="keyword">val</span> clear_flags</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p>Clear all global flags.</p>
+</div>
+</div>
+
+<pre><span id="VALunderflow_p"><span class="keyword">val</span> underflow_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is underflow flag set?</p>
+</div>
+</div>
+
+<pre><span id="VALoverflow_p"><span class="keyword">val</span> overflow_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is overflow flag set?</p>
+</div>
+</div>
+
+<pre><span id="VALdivby0_p"><span class="keyword">val</span> divby0_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is divide-by-zero flag set?</p>
+</div>
+</div>
+
+<pre><span id="VALnanflag_p"><span class="keyword">val</span> nanflag_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is invalid flag set?</p>
+</div>
+</div>
+
+<pre><span id="VALinexflag_p"><span class="keyword">val</span> inexflag_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is inexact flag set?</p>
+</div>
+</div>
+
+<pre><span id="VALerangeflag_p"><span class="keyword">val</span> erangeflag_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
+<div class="info-desc">
+<p>Is <em>erange</em> flag set?</p>
+</div>
+</div>
+</body></html>
