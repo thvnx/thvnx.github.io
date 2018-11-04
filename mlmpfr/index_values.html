@@ -94,6 +94,14 @@
 
 </div>
 </td></tr>
+<tr><td align="left"><div>B</div></td></tr>
+<tr><td><a href="Mpfr.html#VALbeta">beta</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.beta op1 op2</code> returns the Beta function at arguments <code class="code">op1</code>
+   and <code class="code">op2</code>.</p>
+
+</div>
+</td></tr>
 <tr><td align="left"><div>C</div></td></tr>
 <tr><td><a href="Mpfr.html#VALcan_round">can_round</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
@@ -378,6 +386,39 @@ an integer in the direction <code class="code">~rnd</code>.</p>
 
 </div>
 </td></tr>
+<tr><td><a href="Mpfr.html#VALflags_clear">flags_clear</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.flags_clear f</code> clears (lowers) the group of flags specified
+   by mask <code class="code">f</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALflags_restore">flags_restore</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.flags_restore f1 f2</code> restores the flags specified by mask
+   <code class="code">f2</code> to their state represented in flags <code class="code">f1</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALflags_save">flags_save</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p>Return all the flags.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALflags_set">flags_set</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.flags_clear f</code> sets (raises) the group of flags specified by
+   mask <code class="code">f</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALflags_test">flags_test</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p>Return the flags specified by mask.</p>
+
+</div>
+</td></tr>
 <tr><td><a href="Mpfr.html#VALfloat_div">float_div</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
 <p>Division of a <code class="code">float</code> by a <code class="code">mpfr_float</code>.</p>
@@ -403,10 +444,28 @@ numbers.</p>
 
 </div>
 </td></tr>
+<tr><td><a href="Mpfr.html#VALfmma">fmma</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.fmma x y z t</code> retuns <code class="code">xy+zt</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALfmms">fmms</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.fmms x y z t</code> retuns <code class="code">xy-zt</code>.</p>
+
+</div>
+</td></tr>
 <tr><td><a href="Mpfr.html#VALfmod">fmod</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
 <p><code class="code">Mpfr.fmod x y</code> returns the value <code class="code">x - ny</code>, where <code class="code">n</code> is the integer quotient of <code class="code">x / y</code>
 (rounded toward zero).</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALfmodquo">fmodquo</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.fmodquo x y</code> returns the tuple <code class="code">(x - ny, q)</code>.</p>
 
 </div>
 </td></tr>
@@ -427,6 +486,12 @@ numbers.</p>
 <tr><td><a href="Mpfr.html#VALgamma">gamma</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
 <p>Return the Gamma function on a <code class="code">mpfr_float</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALgamma_inc">gamma_inc</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p><code class="code">Mpfr.gamma_inc x y</code> returns the incomplete Gamma function on <code class="code">x</code> and <code class="code">y</code>.</p>
 
 </div>
 </td></tr>
@@ -680,6 +745,12 @@ and the sign of the Gamma function on a <code class="code">mpfr_float</code>.</p
 
 </div>
 </td></tr>
+<tr><td><a href="Mpfr.html#VALlog_int">log_int</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p>Return the natural logarithm of an <code class="code">int</code>.</p>
+
+</div>
+</td></tr>
 <tr><td align="left"><div>M</div></td></tr>
 <tr><td><a href="Mpfr.html#VALmake_from_float">make_from_float</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
@@ -928,19 +999,31 @@ sign of <code class="code">x</code> divided by <code class="code">y</code> (exce
 
 </div>
 </td></tr>
+<tr><td><a href="Mpfr.html#VALrint_roundeven">rint_roundeven</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p>Retrun the input rounded to an integer, i.e.</p>
+
+</div>
+</td></tr>
 <tr><td><a href="Mpfr.html#VALrint_trunc">rint_trunc</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
 <p>Retrun the input rounded to an integer, i.e.</p>
 
 </div>
 </td></tr>
-<tr><td><a href="Mpfr.html#VALroot">root</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<tr><td><a href="Mpfr.html#VALrootn_int">rootn_int</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
-<p><code class="code">Mpfr.root x k</code> returns the <code class="code">k</code>-th root of <code class="code">x</code>.</p>
+<p><code class="code">Mpfr.rootn_int x k</code> returns the <code class="code">k</code>-th root of <code class="code">x</code>.</p>
 
 </div>
 </td></tr>
 <tr><td><a href="Mpfr.html#VALround">round</a> [<a href="Mpfr.html">Mpfr</a>]</td>
+<td><div class="info">
+<p>Retrun the input rounded to an integer, i.e.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Mpfr.html#VALroundeven">roundeven</a> [<a href="Mpfr.html">Mpfr</a>]</td>
 <td><div class="info">
 <p>Retrun the input rounded to an integer, i.e.</p>
 

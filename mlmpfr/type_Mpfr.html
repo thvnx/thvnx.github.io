@@ -23,6 +23,15 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Toward_Plus_Infinity</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Toward_Minus_Infinity</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Away_From_Zero</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Faithful</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;mpfr_flags_t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Underflow</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Overflow</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Nan</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Inexact</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Erange</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Divby0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">All</span><br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;mpfr_prec_min&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;mpfr_prec_max&nbsp;:&nbsp;int<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_default_prec&nbsp;:&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
@@ -108,7 +117,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;cbrt&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;root&nbsp;:<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rootn_int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pow&nbsp;:<br>
@@ -150,6 +159,7 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;unordered_p&nbsp;:&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log_int&nbsp;:&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log2&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log10&nbsp;:<br>
@@ -218,6 +228,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;gamma&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;gamma_inc&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lngamma&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lgamma&nbsp;:<br>
@@ -225,6 +238,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;*&nbsp;<span class="constructor">Mpfr</span>.sign<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;digamma&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;beta&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;zeta&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;erf&nbsp;:<br>
@@ -253,6 +269,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fmma&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fmms&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;agm&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
@@ -269,21 +295,24 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;out_str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Pervasives</span>.out_channel&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Stdlib</span>.out_channel&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;inp_str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Pervasives</span>.in_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Stdlib</span>.in_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ceil&nbsp;:&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;floor&nbsp;:&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;round&nbsp;:&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;roundeven&nbsp;:&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;trunc&nbsp;:&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint_ceil&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint_floor&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint_round&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint_roundeven&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rint_trunc&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
@@ -296,6 +325,9 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fmod&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fmodquo&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;*&nbsp;int<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;remainder&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?rnd:<span class="constructor">Mpfr</span>.mpfr_rnd_t&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
@@ -362,4 +394,10 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;nanflag_p&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;inexflag_p&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;erangeflag_p&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_clear&nbsp;:&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_set&nbsp;:&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_test&nbsp;:&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_save&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_restore&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 <span class="keyword">end</span></code></body></html>

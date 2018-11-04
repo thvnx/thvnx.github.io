@@ -14,13 +14,13 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Laurent Thévenoux
-email: laurent.thevenoux@ens-lyon.fr
+email: lthevenoux@kalray.eu
 description: > # this means to ignore newlines until "baseurl:"
-  Inria Engineer at LIP, ENS de Lyon.
+  Software Engineer at Kalray.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
-github_username:  thvnx
+github_username: thvnx
 
 # Build settings
 markdown: kramdown

@@ -31,39 +31,40 @@
 <div class="info-desc">
 <p>OCaml bindings for MPFR.</p>
 
-<p>A <code class="code">mpfr_float</code> is an immutable data structure that contains a <em>mpfr_t</em> number, as well as an optional ternary value, as provided by
-(and described in) the <a href="http://www.mpfr.org">MPFR library</a>.</p>
+<p>A <code class="code">mpfr_float</code> is an immutable data structure that contains a <em>   mpfr_t</em> number, as well as an optional ternary value, as provided
+   by (and described in) the <a href="http://www.mpfr.org">MPFR library</a>.</p>
 
 <p>A few distinctions are made from the original C library:</p>
 
 <ul>
 <li>the <em>mpfr_</em> prefix is ommited for all functions;</li>
-<li><em>mpfr_init*</em> and <em>mpfr_set*</em> functions are not provided in order to
-implement these bindings with respect to the functional paradigm
-(i.e. immutability). Consequently, <em>mpfr_clear*</em> functions are not
-provided too, and so, the garbage collector is in charge of memory
-management;</li>
-<li>functions managing the following types are not
-supported: <em>unsigned long int</em>, <em>uintmax_t</em>, <em>intmax_t</em>, <em>float</em>, <em>long double</em>, <em>_Decimal64</em>, <em>mpz_t</em>, <em>mpq_t</em>, and <em>mpf_t</em>. Except for <em>mpfr_sqrt_ui</em> and <em>mpfr_fac_ui</em> which are
-partially supported on the range of the positive values of an OCaml
-signed integer. In fact, only the OCaml native types (<code class="code">int</code>, <code class="code">float</code>,
-and <code class="code">string</code>) are supported, assuming that a <code class="code">float</code> is a
-double-precision floating-point number and an <code class="code">int</code> is a 64-bits
-signed integer. Thus, all functions named with <em>*_ui*</em> or <em>*_d*</em>
-are renamed here with <em>*_int*</em> or <em>*_float*</em>, respectively;</li>
-<li>bindings to functions <em>mpfr_*printf</em>, <em>mpfr_*random*</em>, <em>mpfr_get_patches</em>, <em>mpfr_buildopt_*</em>, and macros <em>MPFR_VERSION*</em>
-are not implemented.</li>
+<li><em>   mpfr_init*</em> and <em>mpfr_set*</em> functions are not provided in order
+   to implement these bindings with respect to the functional paradigm
+   (i.e. immutability). Consequently, <em>mpfr_clear*</em> functions are
+   not provided too, and so, the garbage collector is in charge of
+   memory management;</li>
+<li>functions managing the following types are
+   not supported: <em>unsigned long int</em>, <em>uintmax_t</em>, <em>intmax_t</em>,
+   <em>float</em>, <em>long double</em>, <em>__float128</em>, <em>_Decimal64</em>, <em>   mpz_t</em>, <em>mpq_t</em>, and <em>mpf_t</em>. Except for <em>mpfr_sqrt_ui</em> and
+   <em>mpfr_fac_ui</em> which are partially supported on the range of the
+   positive values of an OCaml signed integer. In fact, only the OCaml
+   native types (<code class="code">int</code>, <code class="code">float</code>, and <code class="code">string</code>) are supported, assuming
+   that a <code class="code">float</code> is a double-precision floating-point number and an
+   <code class="code">int</code> is a 64-bits signed integer. Thus, all functions named with
+   <em>*_ui*</em> or <em>*_d*</em> are renamed here with <em>*_int*</em> or <em>   *_float*</em>, respectively;</li>
+<li>bindings to functions <em>   mpfr_*printf</em>, <em>mpfr_*random*</em>, <em>mpfr_get_patches</em>, <em>   mpfr_buildopt_*</em>, <em>mpfr_fpif_*</em>, and, macros <em>MPFR_VERSION*</em>,
+   <em>mpfr_round_nearest_away</em> are not implemented.</li>
 </ul>
 
 <p>In the sequel, if not provided, optional parameters <code class="code">prec</code> and <code class="code">rnd</code>
-are set to MPFR's defaults precision and rounding mode. Functions
-which take a precision, or a base as a parameter raise exceptions. See
-<code class="code">Precision_range</code> and <code class="code">Base_range</code>.</p>
+   are set to MPFR's defaults precision and rounding mode. Functions
+   which take a precision, or a base as a parameter raise
+   exceptions. See <code class="code">Precision_range</code> and <code class="code">Base_range</code>.</p>
 
 <p>Some of the comments below are derived from the
-<a href="http://www.mpfr.org/mpfr-current/mpfr.html">MPFR documentation</a>
-itself. Nevertheless, please refer to the original documentation for
-further explanations.</p>
+   <a href="http://www.mpfr.org/mpfr-current/mpfr.html">MPFR documentation</a>
+   itself. Nevertheless, please refer to the original documentation
+   for further explanations.</p>
 </div>
 </div>
 <hr width="100%">
@@ -181,12 +182,78 @@ value indicates if it was correctly rounded.</p>
 <td align="left" valign="top" >
 <code><span id="TYPEELTmpfr_rnd_t.Away_From_Zero"><span class="constructor">Away_From_Zero</span></span></code></td>
 
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_rnd_t.Faithful"><span class="constructor">Faithful</span></span></code></td>
+
 </tr></table>
 
 <div class="info ">
 <div class="info-desc">
 <p>Rounding
 <a href="http://www.mpfr.org/mpfr-current/mpfr.html#Rounding-Modes">modes</a>.</p>
+</div>
+</div>
+
+
+<pre><code><span id="TYPEmpfr_flags_t"><span class="keyword">type</span> <code class="type"></code>mpfr_flags_t</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Underflow"><span class="constructor">Underflow</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Overflow"><span class="constructor">Overflow</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Nan"><span class="constructor">Nan</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Inexact"><span class="constructor">Inexact</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Erange"><span class="constructor">Erange</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.Divby0"><span class="constructor">Divby0</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmpfr_flags_t.All"><span class="constructor">All</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+<div class="info-desc">
+<p>Flags as described
+<a href="https://www.mpfr.org/mpfr-current/mpfr.html#Exceptions">here</a>.</p>
 </div>
 </div>
 
@@ -462,9 +529,9 @@ them).</p>
 </div>
 </div>
 
-<pre><span id="VALroot"><span class="keyword">val</span> root</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<pre><span id="VALrootn_int"><span class="keyword">val</span> rootn_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
-<p><code class="code">Mpfr.root x k</code> returns the <code class="code">k</code>-th root of <code class="code">x</code>.</p>
+<p><code class="code">Mpfr.rootn_int x k</code> returns the <code class="code">k</code>-th root of <code class="code">x</code>.</p>
 </div>
 </div>
 
@@ -633,6 +700,12 @@ them).</p>
 <pre><span id="VALlog"><span class="keyword">val</span> log</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p>Return the natural logarithm of a <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALlog_int"><span class="keyword">val</span> log_int</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the natural logarithm of an <code class="code">int</code>.</p>
 </div>
 </div>
 
@@ -830,6 +903,12 @@ number.</p>
 </div>
 </div>
 
+<pre><span id="VALgamma_inc"><span class="keyword">val</span> gamma_inc</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.gamma_inc x y</code> returns the incomplete Gamma function on <code class="code">x</code> and <code class="code">y</code>.</p>
+</div>
+</div>
+
 <pre><span id="VALlngamma"><span class="keyword">val</span> lngamma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p>Return the logarithm of the Gamma function on a <code class="code">mpfr_float</code>.</p>
@@ -847,6 +926,13 @@ and the sign of the Gamma function on a <code class="code">mpfr_float</code>.</p
 <div class="info-desc">
 <p>Return the Digamma (sometimes also called Psi) function on a
 <code class="code">mpfr_float</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALbeta"><span class="keyword">val</span> beta</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.beta op1 op2</code> returns the Beta function at arguments <code class="code">op1</code>
+   and <code class="code">op2</code>.</p>
 </div>
 </div>
 
@@ -920,7 +1006,23 @@ numbers. <code class="code">Mpfr.fma x y z</code> retuns <code class="code">xy+z
 <pre><span id="VALfms"><span class="keyword">val</span> fms</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p>Return the fused multiply and sub of <code class="code">mpfr_float</code>
-numbers. <code class="code">Mpfr.fma x y z</code> retuns <code class="code">xy-z</code>.</p>
+numbers. <code class="code">Mpfr.fms x y z</code> retuns <code class="code">xy-z</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfmma"><span class="keyword">val</span> fmma</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fmma x y z t</code> retuns <code class="code">xy+zt</code>. In case the computation of
+   <code class="code">xy</code> overflows or underflows (or that of <code class="code">zt</code>), the result is
+   computed as if the two intermediate products were computed with
+   rounding toward zero.</p>
+</div>
+</div>
+
+<pre><span id="VALfmms"><span class="keyword">val</span> fmms</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -><br>       <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fmms x y z t</code> retuns <code class="code">xy-zt</code>. See <code class="code">Mpfr.fmma</code> for further
+   comments</p>
 </div>
 </div>
 
@@ -974,7 +1076,7 @@ numbers. <code class="code">Mpfr.fma x y z</code> retuns <code class="code">xy-z
 <h3 id="2_InputandOutput">Input and Output</h3><p>The two following functions are <b>deprecated</b>. Use
 <code class="code">Mpfr.get_formatted_str</code> and <code class="code">Mpfr.make_from_str</code>.</p>
 
-<pre><span id="VALout_str"><span class="keyword">val</span> out_str</span> : <code class="type">Pervasives.out_channel -><br>       int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> unit</code></pre><div class="info ">
+<pre><span id="VALout_str"><span class="keyword">val</span> out_str</span> : <code class="type">Stdlib.out_channel -><br>       int -> int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> unit</code></pre><div class="info ">
 <div class="info-desc">
 <p><code class="code">Mpfr.out_str stdout b s x Mpfr.To_Nearest</code> outputs <code class="code">x</code>, in base
 <code class="code">b</code>, to <code class="code">stdout</code>, in the direction <code class="code">Mpfr.To_Nearest</code>. The size of the
@@ -983,7 +1085,7 @@ printed output is <code class="code">s</code> digits long. It uses <code class="
 </div>
 </div>
 
-<pre><span id="VALinp_str"><span class="keyword">val</span> inp_str</span> : <code class="type">Pervasives.in_channel -> int -> int -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<pre><span id="VALinp_str"><span class="keyword">val</span> inp_str</span> : <code class="type">Stdlib.in_channel -> int -> int -> <a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p><code class="code">Mpfr.inp_str stdin b p Mpfr.To_Nearest</code> returns a <code class="code">mpfr_float</code>
 number of precision <code class="code">p</code> from a string in base <code class="code">b</code> read on <code class="code">stdin</code>. It
@@ -1018,6 +1120,14 @@ away from zero as in the roundTiesToAway mode of IEEE 754-2008).</p>
 </div>
 </div>
 
+<pre><span id="VALroundeven"><span class="keyword">val</span> roundeven</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest
+   representable integer (rounding halfway cases athe even-rounding
+   rule).</p>
+</div>
+</div>
+
 <pre><span id="VALtrunc"><span class="keyword">val</span> trunc</span> : <code class="type">?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p>Retrun the input rounded to an integer, i.e. the nearest representable integer toward zero.</p>
@@ -1045,6 +1155,15 @@ cases away from zero). If the result is not representable, it is rounded in the 
 </div>
 </div>
 
+<pre><span id="VALrint_roundeven"><span class="keyword">val</span> rint_roundeven</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p>Retrun the input rounded to an integer, i.e. the nearest
+   representable integer (rounding halfway cases to the nearest even
+   integer). If the result is not representable, it is rounded in the
+   direction <code class="code">~rnd</code></p>
+</div>
+</div>
+
 <pre><span id="VALrint_trunc"><span class="keyword">val</span> rint_trunc</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -> ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
 <div class="info-desc">
 <p>Retrun the input rounded to an integer, i.e. the next integer toward zero.
@@ -1068,6 +1187,13 @@ If the result is not representable, it is rounded in the direction <code class="
 <div class="info-desc">
 <p><code class="code">Mpfr.fmod x y</code> returns the value <code class="code">x - ny</code>, where <code class="code">n</code> is the integer quotient of <code class="code">x / y</code>
 (rounded toward zero).</p>
+</div>
+</div>
+
+<pre><span id="VALfmodquo"><span class="keyword">val</span> fmodquo</span> : <code class="type">?rnd:<a href="Mpfr.html#TYPEmpfr_rnd_t">mpfr_rnd_t</a> -><br>       ?prec:int -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> * int</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fmodquo x y</code> returns the tuple <code class="code">(x - ny, q)</code>. See
+   <code class="code">Mpfr.remquo</code> for the meanings of <code class="code">n</code> and <code class="code">q</code>.</p>
 </div>
 </div>
 
@@ -1378,6 +1504,43 @@ to precision <em>EXP(<code class="code">x</code>)-emin+1</em> according to round
 <pre><span id="VALerangeflag_p"><span class="keyword">val</span> erangeflag_p</span> : <code class="type">unit -> bool</code></pre><div class="info ">
 <div class="info-desc">
 <p>Is <em>erange</em> flag set?</p>
+</div>
+</div>
+<p>The <code class="code">Mpfr.flags_*</code> functions below that take or return an argument
+   mask (i.e., a list of <code class="code">mpfr_flags_t</code> flags) can operate on any
+   subset of the exception flags.</p>
+
+<pre><span id="VALflags_clear"><span class="keyword">val</span> flags_clear</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.flags_clear f</code> clears (lowers) the group of flags specified
+   by mask <code class="code">f</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALflags_set"><span class="keyword">val</span> flags_set</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.flags_clear f</code> sets (raises) the group of flags specified by
+   mask <code class="code">f</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALflags_test"><span class="keyword">val</span> flags_test</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list -> <a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return the flags specified by mask.</p>
+</div>
+</div>
+
+<pre><span id="VALflags_save"><span class="keyword">val</span> flags_save</span> : <code class="type">unit -> <a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list</code></pre><div class="info ">
+<div class="info-desc">
+<p>Return all the flags. It is equivalent to <code class="code">Mpfr.flags_test
+   [Mpfr.All]</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALflags_restore"><span class="keyword">val</span> flags_restore</span> : <code class="type"><a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list -> <a href="Mpfr.html#TYPEmpfr_flags_t">mpfr_flags_t</a> list -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.flags_restore f1 f2</code> restores the flags specified by mask
+   <code class="code">f2</code> to their state represented in flags <code class="code">f1</code>.</p>
 </div>
 </div>
 </body></html>
