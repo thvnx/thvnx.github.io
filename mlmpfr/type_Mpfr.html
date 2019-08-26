@@ -400,4 +400,6 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_save&nbsp;:&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;flags_restore&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_flags_t&nbsp;list&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fpif_export&nbsp;:&nbsp;<span class="constructor">Stdlib</span>.out_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fpif_import&nbsp;:&nbsp;<span class="constructor">Stdlib</span>.in_channel&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Mpfr</span>.mpfr_float<br>
 <span class="keyword">end</span></code></body></html>

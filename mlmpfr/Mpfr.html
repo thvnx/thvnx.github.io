@@ -52,7 +52,7 @@
    that a <code class="code">float</code> is a double-precision floating-point number and an
    <code class="code">int</code> is a 64-bits signed integer. Thus, all functions named with
    <em>*_ui*</em> or <em>*_d*</em> are renamed here with <em>*_int*</em> or <em>   *_float*</em>, respectively;</li>
-<li>bindings to functions <em>   mpfr_*printf</em>, <em>mpfr_*random*</em>, <em>mpfr_get_patches</em>, <em>   mpfr_buildopt_*</em>, <em>mpfr_fpif_*</em>, and, macros <em>MPFR_VERSION*</em>,
+<li>bindings to functions <em>   mpfr_*printf</em>, <em>mpfr_*random*</em>, <em>mpfr_get_patches</em>, <em>   mpfr_buildopt_*</em>, and, macros <em>MPFR_VERSION*</em>,
    <em>mpfr_round_nearest_away</em> are not implemented.</li>
 </ul>
 
@@ -1541,6 +1541,28 @@ to precision <em>EXP(<code class="code">x</code>)-emin+1</em> according to round
 <div class="info-desc">
 <p><code class="code">Mpfr.flags_restore f1 f2</code> restores the flags specified by mask
    <code class="code">f2</code> to their state represented in flags <code class="code">f1</code>.</p>
+</div>
+</div>
+
+<pre><span id="VALfpif_export"><span class="keyword">val</span> fpif_export</span> : <code class="type">Stdlib.out_channel -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a> -> unit</code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fpif_export chan op</code> exports the number <code class="code">op</code> to the stream <code class="code">chan</code> in a
+   floating-point interchange format. In particular one can export on a 32-bit
+   computer and import on a 64-bit computer, or export on a little-endian computer
+   and import on a big-endian computer. The precision of op and the sign bit of a
+   NaN are stored too.</p>
+</div>
+</div>
+
+<pre><span id="VALfpif_import"><span class="keyword">val</span> fpif_import</span> : <code class="type">Stdlib.in_channel -> <a href="Mpfr.html#TYPEmpfr_float">mpfr_float</a></code></pre><div class="info ">
+<div class="info-desc">
+<p><code class="code">Mpfr.fpif_import chan</code> imports a <code class="code">mpfr_float</code> number from the stream <code class="code">chan</code> in a
+   floating-point interchange format (see <code class="code">Mpfr.mpfr_fpif_export</code>). Note that the precision
+   of <code class="code">op</code> is set to the one read from the stream, and the sign bit is always retrieved
+   (even for NaN). If the stored precision is zero or greater than <code class="code">Mpfr.mpfr_prec_max</code>,
+   the function fails (its ternary value is non-zero) and <code class="code">op</code> is undefined. If the function
+   fails for another reason, <code class="code">op</code> is set to NaN. Ternary value is 0 iff the import
+   was successful.</p>
 </div>
 </div>
 </body></html>
